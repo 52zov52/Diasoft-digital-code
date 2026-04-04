@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"time"
 
 	"github.com/diasoft/diplomaverify/internal/models"
 	"github.com/redis/go-redis/v9"
@@ -40,12 +41,11 @@ func (s *QRService) GenerateQRToken(ctx context.Context, diplomaID string, ttlSe
 
 	// Сохраняем токен в Redis с TTL
 	key := fmt.Sprintf("qr:%s", token)
-	if err := s.rdb.Set(ctx, key, diplomaID, 
-		// ttlSeconds может быть 0 для "бессрочного" токена в демо
-		// но в продакшене всегда должен быть > 0
-	).Err(); err != nil {
+	expiration := time.Duration(ttlSeconds) * time.Second
+	
+	// ✅ Правильный вызов: 4 аргумента (ctx, key, value, expiration)
+	if err := s.rdb.Set(ctx, key, diplomaID, expiration).Err(); err != nil {
 		// Логируем ошибку, но не прерываем — токен всё равно можно использовать
-		// В реальном приложении здесь может быть fallback на БД
 	}
 
 	return token, nil
@@ -55,7 +55,6 @@ func (s *QRService) GenerateQRToken(ctx context.Context, diplomaID string, ttlSe
 // В демо-режиме просто валидирует формат и возвращает токен как есть
 func (s *QRService) VerifyQRToken(ctx context.Context, token string) (string, error) {
 	// Демо-режим: токен уже содержит diploma_id
-	// Проверяем минимальную валидность (UUID имеет длину 36, но можем принимать короче)
 	if s.rdb == nil {
 		if len(token) < 10 {
 			return "", fmt.Errorf("invalid token format")
@@ -67,13 +66,12 @@ func (s *QRService) VerifyQRToken(ctx context.Context, token string) (string, er
 	key := fmt.Sprintf("qr:%s", token)
 	diplomaID, err := s.rdb.Get(ctx, key).Result()
 	
-	// Правильная константа для go-redis v9: redis.Nil (не ErrNil!)
+	// Правильная константа для go-redis v9: redis.Nil
 	if err == redis.Nil {
 		return "", fmt.Errorf("token expired or invalid")
 	}
 	if err != nil {
 		// Если Redis временно недоступен — fallback на демо-режим
-		// В продакшене здесь может быть логика повтора или возврат ошибки
 		return token, nil
 	}
 
@@ -84,10 +82,6 @@ func (s *QRService) VerifyQRToken(ctx context.Context, token string) (string, er
 }
 
 // GetDiplomaByID возвращает диплом по ID (заглушка для демо)
-// В реальном приложении здесь будет запрос к репозиторию
 func (s *QRService) GetDiplomaByID(ctx context.Context, diplomaID string) (*models.Diploma, error) {
-	// Заглушка: в демо возвращаем ошибку, чтобы фронтенд показал "не найден"
-	// В продакшене:
-	// return s.repo.GetByID(ctx, diplomaID)
 	return nil, fmt.Errorf("not implemented in demo mode")
 }
