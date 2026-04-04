@@ -5,12 +5,12 @@ import { showToast } from '../router.js';
 export async function render() {
   document.getElementById('app-outlet').innerHTML = `
     <div class="card">
-      <h2>🕵️ Верификация диплома</h2>
+      <h2>Верификация диплома</h2>
       <input type="text" id="hr-number" placeholder="Номер диплома" required>
       <input type="text" id="hr-uni" placeholder="Код вуза" required>
       <button class="btn" id="btn-verify">Проверить вручную</button>
       <hr style="margin:15px 0; border:0; border-top:1px solid var(--border);">
-      <button class="btn" id="btn-scan" style="background:#475569">📷 Сканировать QR</button>
+      <button class="btn" id="btn-scan" style="background:#475569">Сканировать QR</button>
       <div id="reader" class="hidden"></div>
     </div>
     <div id="hr-result" class="card hidden"></div>
@@ -73,7 +73,7 @@ export async function render() {
           
           // 4. Показываем результат
           renderResult(res);
-          showToast('✅ Диплом верифицирован!', 'success');
+          showToast('Диплом верифицирован!', 'success');
           
         } catch(e) {
           console.error('QR Scan error:', e);

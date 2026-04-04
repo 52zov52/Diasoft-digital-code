@@ -3,29 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Strict CSP for XSS protection -->
-  <meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
-               connect-src 'self' http://localhost:8080 https://api.diplomaverify.ru https://diploma-verify-backend.onrender.com; 
-               script-src 'self' 'unsafe-inline' https://unpkg.com; 
-               style-src 'self' 'unsafe-inline'; 
-               img-src 'self' data: https:;">
-  <title>DiplomaVerify</title>
-  <link rel="stylesheet" href="css/main.css">
-  <!-- QR Scanner Library -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+  <title>DiplomaVerify | Система верификации дипломов</title>
+  
+  <!-- Шрифт Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Иконки FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <header>
-    <div class="logo">DiplomaVerify</div>
-    <nav id="role-tabs">
-      <button data-route="#student">Студент</button>
-      <button data-route="#university">ВУЗ</button>
-      <button data-route="#hr">HR / Работодатель</button>
-    </nav>
+  <!-- Хедер с логотипом -->
+  <header class="main-header">
+    <div class="container header-content">
+      <div class="logo">
+        <i class="fa-solid fa-shield-halved logo-icon"></i>
+        <span>DiplomaVerify</span>
+      </div>
+      <div class="header-status">
+        <span class="badge status-active"><i class="fa-solid fa-check-circle"></i> Система активна</span>
+      </div>
+    </div>
   </header>
-  <main id="app-outlet"></main>
+
+  <!-- Навигация (вкладки) -->
+  <nav class="container">
+    <div class="tabs" id="role-tabs">
+      <!-- Кнопки будут добавлены автоматически через routes.js -->
+    </div>
+  </nav>
+
+  <!-- Основной контент -->
+  <main class="container">
+    <div id="app-outlet"></div>
+  </main>
+
+  <!-- Контейнер для уведомлений (тостов) -->
   <div id="toast-container"></div>
-  <script type="module" src="js/router.js"></script>
+
+  <!-- Скрипты -->
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

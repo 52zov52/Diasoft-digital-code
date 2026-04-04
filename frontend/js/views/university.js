@@ -4,14 +4,14 @@ import { showToast } from '../router.js';
 export async function render() {
   document.getElementById('app-outlet').innerHTML = `
     <div class="card">
-      <h2>🏛 Кабинет ВУЗа</h2>
+      <h2>Кабинет ВУЗа</h2>
       <p style="margin-bottom:10px; color:#64748b; font-size:13px;">Загрузите реестр (CSV: serial,fio,year,specialty)</p>
       <input type="file" id="csv-file" accept=".csv">
       <button class="btn" id="btn-upload">Загрузить и подписать</button>
       <div id="upload-status" class="hidden" style="margin-top:10px; color:var(--primary); font-weight:500;"></div>
     </div>
     <div class="card">
-      <h3>📊 Последние загруженные записи</h3>
+      <h3>Последние загруженные записи</h3>
       <table id="diploma-table">
         <thead><tr><th>Серийный номер</th><th>Специальность</th><th>Год</th></tr></thead>
         <tbody id="table-body"><tr><td colspan="3" style="text-align:center">Загрузка...</td></tr></tbody>
@@ -31,7 +31,7 @@ export async function render() {
     
     const statusEl = document.getElementById('upload-status');
     statusEl.classList.remove('hidden');
-    statusEl.textContent = '⏳ Парсинг и отправка...';
+    statusEl.textContent = 'Парсинг и отправка...';
 
     try {
       const text = await file.text();
@@ -56,7 +56,7 @@ export async function render() {
       });
       
       updateTable(formattedRecords.slice(0, 5));
-      statusEl.textContent = `✅ Успешно: ${formattedRecords.length} записей`;
+      statusEl.textContent = `Успешно: ${formattedRecords.length} записей`;
       showToast('Реестр обновлен', 'success');
       
       // Перезагружаем данные через 1 секунду
