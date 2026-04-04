@@ -1,18 +1,39 @@
-export function initScanner(onSuccess, onError) {
-  const html5QrCode = new Html5Qrcode("reader");
-  const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
-  
-  html5QrCode.start(
-    { facingMode: "environment" },
-    config,
-    (decodedText) => {
-      html5QrCode.stop().catch(console.warn);
-      onSuccess(decodedText);
+let html5QrcodeScanner = null;
+
+export function initScanner(onScanSuccess, onScanError) {
+  // Если сканер уже инициализирован — очищаем
+  if (html5QrcodeScanner) {
+    html5QrcodeScanner.clear().catch(err => {
+      console.error('Failed to clear scanner', err);
+    });
+  }
+
+  // Создаём новый сканер
+  html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader", // ID элемента в HTML
+    {
+      fps: 10, // кадров в секунду
+      qrbox: { width: 250, height: 250 }, // размер области сканирования
+      aspectRatio: 1.0,
+      disableFlip: false,
+      videoConstraints: {
+        facingMode: "environment" // используем заднюю камеру
+      }
     },
-    () => {} // Игнорируем промежуточные ошибки сканирования
-  ).catch(err => {
-    onError("Камера недоступна. Разрешите доступ в настройках браузера.");
-    console.error(err);
-  });
-  return html5QrCode;
+    /* verbose= */ false
+  );
+
+  // Запускаем сканер
+  html5QrcodeScanner.render(onScanSuccess, onScanError || ((error) => {
+    console.warn('QR Scan error:', error);
+  }));
+}
+
+export function stopScanner() {
+  if (html5QrcodeScanner) {
+    html5QrcodeScanner.clear().catch(err => {
+      console.error('Failed to stop scanner', err);
+    });
+    html5QrcodeScanner = null;
+  }
 }

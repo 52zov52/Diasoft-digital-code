@@ -33,60 +33,69 @@ export async function render() {
   };
 
   // Сканирование QR
-  document.getElementById('btn-scan').onclick = () => {
+  // Сканирование QR-кода
+  document.getElementById('btn-scan').onclick = async () => {
     const readerEl = document.getElementById('reader');
     readerEl.classList.remove('hidden');
     
-    initScanner(
-      async (decodedText) => {
-        // Скрываем сканер после успешного считывания
-        readerEl.classList.add('hidden');
-        
-        try {
-          // 1. Извлекаем токен из ссылки (универсальный парсинг)
-          // Поддерживает форматы:
-          // - "abc123" (чистый токен)
-          // - "https://.../verify/qr/abc123" (полная ссылка)
-          // - "https://.../verify/qr/abc123/" (со слэшем в конце)
+    try {
+      // Импортируем функцию инициализации сканера
+      const { initScanner } = await import('../scanner.js');
+      
+      initScanner(
+        // ✅ Успешное сканирование
+        async (decodedText) => {
+          console.log('✅ QR scanned:', decodedText);
           
-          let token = decodedText.trim();
+          // Останавливаем сканер
+          const { stopScanner } = await import('../scanner.js');
+          stopScanner();
           
-          if (token.includes('/verify/qr/')) {
-            // Разбиваем по '/verify/qr/' и берем вторую часть
-            const parts = token.split('/verify/qr/');
-            if (parts.length === 2) {
-              token = parts[1];
-              // Убираем лишние слэши и параметры (?...)
-              token = token.split('?')[0].replace(/\/$/, '');
-            }
-          }
-          
-          // 2. Валидация токена
-          if (!token || token.length < 5) {
-            throw new Error('Некорректный формат QR-кода');
-          }
-          
-          console.log('Scanned token:', token);
-          
-          // 3. Отправляем на верификацию
-          const res = await api.get(`/api/v1/verify/qr/${token}`);
-          
-          // 4. Показываем результат
-          renderResult(res);
-          showToast('Диплом верифицирован!', 'success');
-          
-        } catch(e) {
-          console.error('QR Scan error:', e);
-          showToast('Ошибка: ' + e.message, 'error');
           readerEl.classList.add('hidden');
+          
+          try {
+            // Извлекаем токен из ссылки
+            let token = decodedText.trim();
+            
+            if (token.includes('/verify/qr/')) {
+              const parts = token.split('/verify/qr/');
+              if (parts.length >= 2) {
+                token = parts[parts.length - 1];
+                token = token.split('?')[0].split('#')[0].replace(/\/+$/, '');
+              }
+            }
+            
+            if (!token || token.length < 10) {
+              throw new Error('Некорректный формат QR-кода');
+            }
+            
+            console.log('🔍 Verifying token:', token);
+            
+            // Отправляем на верификацию
+            const res = await api.get(`/api/v1/verify/qr/${token}`);
+            
+            // Показываем результат
+            renderResult(res);
+            showToast('✅ Диплом верифицирован!', 'success');
+            
+          } catch(e) {
+            console.error('❌ QR verification error:', e);
+            showToast('Ошибка: ' + (e.message || 'Не удалось проверить'), 'error');
+          }
+        },
+        
+        // ❌ Ошибка сканера
+        (err) => {
+          console.error('Scanner error:', err);
+          // Не показываем ошибку для каждого кадра — это нормально
         }
-      },
-      (err) => { 
-        console.error('Scanner error:', err);
-        showToast('Ошибка сканера: ' + err, 'error'); 
-        readerEl.classList.add('hidden'); 
-      }
-    );
+      );
+      
+    } catch (err) {
+      console.error('Failed to init scanner:', err);
+      showToast('Ошибка инициализации сканера: ' + err.message, 'error');
+      readerEl.classList.add('hidden');
+    }
   };
 }
 
