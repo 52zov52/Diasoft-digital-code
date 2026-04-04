@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports: ["9090:9090"]
+    volumes: ["./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"]
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports: ["3000:3000"]
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes: ["./grafana/dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json"]
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports: ["9100:9100"]
+    volumes: ["/proc:/host/proc:ro", "/sys:/host/sys:ro"]
+    command: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]

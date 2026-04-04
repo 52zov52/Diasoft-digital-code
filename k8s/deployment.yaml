@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diplomaverify-api
+  labels: { app: diplomaverify, tier: backend, version: v0.6.0 }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: diplomaverify } }
+  strategy: { type: RollingUpdate, rollingUpdate: { maxUnavailable: 0, maxSurge: 1 } }
+  template:
+    metadata: { labels: { app: diplomaverify } }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 1000, fsGroup: 2000 }
+      containers:
+      - name: api
+        image: ghcr.io/diasoft/diplomaverify:latest
+        ports: [{ containerPort: 8080, protocol: TCP }]
+        envFrom:
+        - configMapRef: { name: dv-config }
+        - secretRef: { name: dv-secrets }
+        resources:
+          requests: { cpu: 100m, memory: 128Mi }
+          limits: { cpu: 500m, memory: 256Mi }
+        livenessProbe:
+          httpGet: { path: /health, port: 8080 }
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet: { path: /health, port: 8080 }
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 2
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities: { drop: ["ALL"] }

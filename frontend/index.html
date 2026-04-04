@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Strict CSP for XSS protection -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' http://localhost:8080 https://api.diplomaverify.ru;">
+  <title>DiplomaVerify</title>
+  <link rel="stylesheet" href="css/main.css">
+  <!-- QR Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="logo">🎓 DiplomaVerify</div>
+    <nav id="role-tabs">
+      <button data-route="#student">Студент</button>
+      <button data-route="#university">ВУЗ</button>
+      <button data-route="#hr">HR / Работодатель</button>
+    </nav>
+  </header>
+  <main id="app-outlet"></main>
+  <div id="toast-container"></div>
+  <script type="module" src="js/router.js"></script>
+</body>
+</html>

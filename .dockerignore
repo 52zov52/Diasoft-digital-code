@@ -1,0 +1,9 @@
+.git/
+.github/
+.vscode/
+*.md
+docker-compose.yml
+k8s/
+.env*
+coverage.out
+vendor/

@@ -1,0 +1,8 @@
+# k8s/service.yaml
+apiVersion: v1
+kind: Service
+metadata: { name: diplomaverify-svc }
+spec:
+  selector: { app: diplomaverify }
+  ports: [{ port: 80, targetPort: 8080, protocol: TCP }]
+  type: ClusterIP

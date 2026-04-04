@@ -1,0 +1,103 @@
+openapi: 3.0.3
+info:
+  title: DiplomaVerify API
+  version: 1.0.0
+  description: Platform for digital diploma verification. Diasoft 2026.
+  contact:
+    name: Diasoft DevTeam
+    url: https://diasoft.ru
+
+servers:
+  - url: http://localhost:8080
+    description: Development
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+paths:
+  /api/v1/verify:
+    get:
+      summary: Manual diploma verification
+      parameters:
+        - in: query
+          name: number
+          required: true
+          schema: { type: string, minLength: 5, maxLength: 32 }
+        - in: query
+          name: university_code
+          required: true
+          schema: { type: string, minLength: 2, maxLength: 16 }
+      responses:
+        '200':
+          description: Verification result
+          content: { application/json: { schema: { $ref: '#/components/schemas/VerifyResponse' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  /api/v1/verify/qr/{token}:
+    get:
+      summary: QR token verification
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { $ref: '#/components/responses/QRVerify' }
+
+  /api/v1/diplomas/bulk:
+    post:
+      summary: Bulk upload diploma registry (University)
+      security: [{ BearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BulkUploadRequest' }
+      responses:
+        '201': { $ref: '#/components/responses/Created' }
+
+  /api/v1/auth/qr/generate:
+    post:
+      summary: Generate temporary QR link (Student)
+      security: [{ BearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/QRGenerated' }
+
+components:
+  securitySchemes:
+    BearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+    ApiKeyAuth: { type: apiKey, in: header, name: X-API-Key }
+  schemas:
+    VerifyResponse:
+      type: object
+      properties:
+        valid: { type: boolean }
+        status: { type: string, enum: [active, revoked, expired] }
+        university: { type: string }
+        issued_year: { type: integer }
+    BulkUploadRequest:
+      type: object
+      required: [university_code, records]
+      properties:
+        university_code: { type: string }
+        records:
+          type: array
+          items: { $ref: '#/components/schemas/Record' }
+    Record:
+      type: object
+      required: [fio, year, specialty, serial]
+      properties:
+        fio: { type: string, minLength: 3 }
+        year: { type: integer, minimum: 1990, maximum: 2030 }
+        specialty: { type: string }
+        serial: { type: string }
+  responses:
+    BadRequest:
+      description: Validation error
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        details: { type: string }

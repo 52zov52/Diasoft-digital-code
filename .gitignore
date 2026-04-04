@@ -1,0 +1,15 @@
+# Секреты и настройки окружения
+.env
+.env.local
+
+# Скомпилированные файлы Go
+diploma-verify.exe
+*.exe
+
+# IDE и системные файлы
+.vscode/
+.idea/
+.DS_Store
+
+# Модули Go (опционально, лучше оставить go.mod и go.sum)
+# vendor/
