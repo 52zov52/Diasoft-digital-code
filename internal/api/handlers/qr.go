@@ -18,7 +18,7 @@ type QRHandler struct {
 func NewQRHandler(svc *service.QRService) *QRHandler {
 	return &QRHandler{
 		svc:     svc,
-		baseURL: "http://localhost:8080/api/v1",
+		baseURL: "https://diploma-verify-backend.onrender.com/api/v1",
 	}
 }
 
