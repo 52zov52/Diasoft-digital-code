@@ -1,0 +1,44 @@
+services:
+  # Backend на Go
+  - type: web
+    name: diploma-verify-backend
+    env: go
+    region: frankfurt
+    plan: free
+    buildCommand: "go build -o server ./cmd/server/main.go"
+    startCommand: "./server"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_PORT
+        value: 10000
+      - key: DB_HOST
+        fromDatabase:
+          name: diploma-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: diploma-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: diploma-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: diploma-db
+          property: user
+      - key: DB_PASS
+        fromDatabase:
+          name: diploma-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: AES256_GCM_KEY
+        generateValue: true
+
+databases:
+  - name: diploma-db
+    databaseName: diplomaverify
+    user: app_user
+    plan: free
