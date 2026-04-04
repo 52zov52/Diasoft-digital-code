@@ -4,7 +4,7 @@ import { showToast } from '../router.js';
 export async function render() {
   document.getElementById('app-outlet').innerHTML = `
     <div class="card">
-      <h2>🎓 Личный кабинет студента</h2>
+      <h2>Личный кабинет студента</h2>
       <input type="text" id="stu-number" placeholder="Номер диплома">
       <input type="text" id="stu-uni" placeholder="Код вуза">
       <button class="btn" id="btn-find">Найти диплом</button>
@@ -17,7 +17,7 @@ export async function render() {
         <option value="3600">1 час</option><option value="86400" selected>24 часа</option><option value="604800">7 дней</option>
       </select>
       <button class="btn" id="btn-gen-qr">Сгенерировать QR</button>
-      <button class="btn" id="btn-share" style="background:#10b981">🔗 Поделиться ссылкой</button>
+      <button class="btn" id="btn-share" style="background:#10b981">Поделиться ссылкой</button>
     </div>
   `;
 
@@ -35,16 +35,22 @@ export async function render() {
     const ttl = parseInt(document.getElementById('qr-ttl').value);
     
     try {
-      const res = await api.post('/api/v1/qr/generate', {  // ← Добавлен ведущий /
-        diploma_id: dipId,   // ← Исправлено: dipId вместо diplomaId
-        ttl: ttl             // ← Исправлено: ttl вместо ttlSeconds
+      const res = await api.post('/api/v1/qr/generate', {
+        diploma_id: dipId,
+        ttl: ttl
       });
       
+      console.log('QR Response:', res); // ← Добавьте это для отладки
+      
       document.getElementById('qr-img').src = res.qr_image_base64;
-      document.getElementById('stu-qr-area').classList.remove('hidden');
+      document.getElementById('qr-img').alt = 'QR Code';
+      
+      // Покажите ссылку для проверки
+      console.log('Verify URL:', res.verify_url);
+      
       showToast('QR-код сгенерирован!', 'success');
     } catch(e) { 
-      showToast('Ошибка: ' + e.message, 'error'); 
+      showToast('Ошибка: ' + e.message, 'error');
       console.error('QR generation error:', e);
     }
   };
