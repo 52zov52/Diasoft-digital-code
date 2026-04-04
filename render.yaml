@@ -1,12 +1,12 @@
 services:
-  # Backend на Go
   - type: web
     name: diploma-verify-backend
     env: go
-    region: frankfurt
+    region: oregon  # ← ИЗМЕНИТЕ НА oregon (как у базы)
     plan: free
     buildCommand: "go build -o server ./cmd/server/main.go"
     startCommand: "./server"
+    healthCheckPath: /health
     envVars:
       - key: APP_ENV
         value: production
@@ -32,6 +32,8 @@ services:
         fromDatabase:
           name: diploma-db
           property: password
+      - key: DB_SSL_MODE
+        value: require
       - key: JWT_SECRET
         generateValue: true
       - key: AES256_GCM_KEY
@@ -42,3 +44,5 @@ databases:
     databaseName: diplomaverify
     user: app_user
     plan: free
+    region: oregon  # ← Явно указываем тот же регион
+    ipAllowList: []
