@@ -3,12 +3,14 @@ package service
 import (
 	"context"
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"time"
 
 	"github.com/diasoft/diplomaverify/internal/models"
 	"github.com/redis/go-redis/v9"
+	"github.com/skip2/go-qrcode"
 )
 
 type QRService struct {
@@ -24,10 +26,8 @@ func NewQRService(rdb *redis.Client, baseURL string) *QRService {
 }
 
 // GenerateQRToken генерирует токен для верификации по QR
-// В демо-режиме (без Redis) токен = diploma_id
 func (s *QRService) GenerateQRToken(ctx context.Context, diplomaID string, ttlSeconds int) (string, error) {
 	// Демо-режим: если Redis не подключен, возвращаем сам diplomaID как токен
-	// Это позволяет верификации работать без кэша
 	if s.rdb == nil {
 		return diplomaID, nil
 	}
@@ -43,16 +43,27 @@ func (s *QRService) GenerateQRToken(ctx context.Context, diplomaID string, ttlSe
 	key := fmt.Sprintf("qr:%s", token)
 	expiration := time.Duration(ttlSeconds) * time.Second
 	
-	// ✅ Правильный вызов: 4 аргумента (ctx, key, value, expiration)
 	if err := s.rdb.Set(ctx, key, diplomaID, expiration).Err(); err != nil {
-		// Логируем ошибку, но не прерываем — токен всё равно можно использовать
+		// Логируем, но не прерываем
 	}
 
 	return token, nil
 }
 
+// GenerateQRImage генерирует PNG изображение QR-кода в base64
+func (s *QRService) GenerateQRImage(verifyURL string) (string, error) {
+	// Генерируем QR-код (256x256, средний уровень коррекции)
+	png, err := qrcode.Encode(verifyURL, qrcode.Medium, 256)
+	if err != nil {
+		return "", fmt.Errorf("encode qrcode: %w", err)
+	}
+
+	// Конвертируем в base64 для отправки на фронтенд
+	// Формат: "data:image/png;base64,..." — готов для <img src="">
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(png), nil
+}
+
 // VerifyQRToken проверяет токен и возвращает ID диплома
-// В демо-режиме просто валидирует формат и возвращает токен как есть
 func (s *QRService) VerifyQRToken(ctx context.Context, token string) (string, error) {
 	// Демо-режим: токен уже содержит diploma_id
 	if s.rdb == nil {
@@ -66,12 +77,11 @@ func (s *QRService) VerifyQRToken(ctx context.Context, token string) (string, er
 	key := fmt.Sprintf("qr:%s", token)
 	diplomaID, err := s.rdb.Get(ctx, key).Result()
 	
-	// Правильная константа для go-redis v9: redis.Nil
 	if err == redis.Nil {
 		return "", fmt.Errorf("token expired or invalid")
 	}
 	if err != nil {
-		// Если Redis временно недоступен — fallback на демо-режим
+		// Fallback на демо-режим при ошибке Redis
 		return token, nil
 	}
 
@@ -81,7 +91,7 @@ func (s *QRService) VerifyQRToken(ctx context.Context, token string) (string, er
 	return diplomaID, nil
 }
 
-// GetDiplomaByID возвращает диплом по ID (заглушка для демо)
+// GetDiplomaByID — заглушка для демо
 func (s *QRService) GetDiplomaByID(ctx context.Context, diplomaID string) (*models.Diploma, error) {
 	return nil, fmt.Errorf("not implemented in demo mode")
 }
