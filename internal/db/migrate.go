@@ -47,24 +47,6 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 				UNIQUE(university_id, serial_number)
 			)`,
 		},
-		{
-			name:  "create index diplomas_serial",
-			query: `CREATE INDEX IF NOT EXISTS idx_diplomas_serial ON diplomas(serial_number)`,
-		},
-		{
-			name:  "create index diplomas_university",
-			query: `CREATE INDEX IF NOT EXISTS idx_diplomas_university ON diplomas(university_id)`,
-		},
-		{
-			name:  "create index diplomas_status",
-			query: `CREATE INDEX IF NOT EXISTS idx_diplomas_status ON diplomas(status)`,
-		},
-		{
-			name: "insert test university",
-			query: `INSERT INTO universities (id, code, official_name, public_key_pem)
-				VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'TEST01', 'Тестовый ВУЗ', 'stub_public_key')
-				ON CONFLICT (code) DO NOTHING`,
-		},
 	}
 
 	for _, q := range queries {
