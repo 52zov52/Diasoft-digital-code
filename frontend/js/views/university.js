@@ -56,7 +56,7 @@ export async function render() {
       });
       
       updateTable(formattedRecords.slice(0, 5));
-      statusEl.textContent = `✅ Успешно: ${formattedRecords.length} записей`;
+      statusEl.textContent = `Успешно: ${formattedRecords.length} записей`;
       showToast('Реестр обновлен', 'success');
       
       // Перезагружаем данные через 1 секунду
