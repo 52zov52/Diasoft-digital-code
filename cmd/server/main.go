@@ -60,6 +60,11 @@ func main() {
 		os.Exit(1) // БД обязательна для работы
 	}
 	defer pool.Close()
+	// 5. Примените миграции
+	if err := db.Migrate(ctx, pool); err != nil {
+	    slog.Error("Database migration failed", "error", err)
+	    os.Exit(1)
+	}
 
 	// 5. Подключение к Redis (опционально)
 	var rdb *redis.Client
