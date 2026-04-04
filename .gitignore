@@ -1,15 +1,34 @@
-# Секреты и настройки окружения
+```
+# Compiled and build artifacts
+*.o
+*.obj
+*.out
+build/
+dist/
+
+# Dependencies
+vendor/
+node_modules/
+*.mod
+*.sum
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
 .env
 .env.local
+*.env.*
 
-# Скомпилированные файлы Go
-diploma-verify.exe
-*.exe
-
-# IDE и системные файлы
+# Editors
 .vscode/
 .idea/
-.DS_Store
+*.swp
+*.swo
 
-# Модули Go (опционально, лучше оставить go.mod и go.sum)
-# vendor/
+# Go specific
+*.test
+*.prof
+```
