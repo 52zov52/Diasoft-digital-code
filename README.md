@@ -425,7 +425,7 @@ curl -X POST http://localhost:8080/api/v1/qr/generate \
 
 ---
 
-## 🔒 Безопасность
+## Безопасность
 
 ### Соответствие 152-ФЗ
 
@@ -459,7 +459,7 @@ curl -X POST http://localhost:8080/api/v1/qr/generate \
 <div align="center">
 
 **DiplomaVerify** — проект для компании Diasoft  
-Разработано Даниилом, 2026
+Разработано DIGITAL CODE, 2026
 
 [⬆ Вернуться к началу](#-diplomaverify)
 
