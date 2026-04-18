@@ -1,6 +1,6 @@
 module github.com/diasoft/diplomaverify
 
-go 1.25.0
+go 1.23
 
 require (
 	github.com/alicebob/miniredis/v2 v2.33.0

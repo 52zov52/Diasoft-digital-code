@@ -1,15 +1,17 @@
+import * as authView from './views/auth.js';
 import * as hrView from './views/hr.js';
 import * as studentView from './views/student.js';
 import * as uniView from './views/university.js';
 
 // 📦 Конфигурация вкладок
 const TABS = [
+  { route: '#auth', label: 'Вход / Регистрация', icon: 'fa-solid fa-right-to-bracket', view: authView },
   { route: '#student', label: 'Студент', icon: 'fa-solid fa-user-graduate', view: studentView },
   { route: '#university', label: 'ВУЗ', icon: 'fa-solid fa-building-columns', view: uniView },
   { route: '#hr', label: 'HR / Работодатель', icon: 'fa-solid fa-magnifying-glass', view: hrView }
 ];
 
-const DEFAULT_ROUTE = '#hr';
+const DEFAULT_ROUTE = '#auth';
 
 // 🎨 Инициализация вкладок
 function initTabs() {
